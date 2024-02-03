@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Plot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        #plot-container {
+            width: 80%;
+            margin: auto;
+        }
+
+        #result {
+            margin-top: 10px;
+        }
+
+        #telegram-btn {
+            background-color: #00a2ff;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        #telegram-icon {
+            width: 20px;  /* Уменьшаем размер иконки */
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+<div id="plot-container"></div>
+<div id="result"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.5.1/plotly.min.js"></script>
+<script>
+    var k, b;
+
+    function plotLine() {
+        var x = Array.from({length: 100}, (_, i) => i - 50);
+        var y = x.map(x => k * x + b);
+
+        var trace = {
+            x: x,
+            y: y,
+            type: 'scatter',
+            mode: 'lines',
+            showlegend: false
+        };
+
+        var gridX = Array.from({length: 21}, (_, i) => i - 10);
+        var gridY = Array.from({length: 21}, (_, i) => i - 10);
+
+        var gridLines = {
+            x: gridX,
+            y: gridY,
+            type: 'scatter',
+            mode: 'markers',
+            marker: {
+                color: 'black',
+                size: 1
+            },
+            showlegend: false
+        };
+
+        var layout = {
+            title: 'График прямой y=kx+b',
+            xaxis: {title: 'X-axis', range: [-10, 10], zeroline: true},
+            yaxis: {title: 'Y-axis', range: [-10, 10], zeroline: true},
+            grid: {rows: 1, columns: 1, pattern: 'independent'},
+            dragmode: false,  // отключаем режим перетаскивания
+            selectdirection: 'h',  // отключаем выделение
+        };
+
+        Plotly.newPlot('plot-container', [gridLines, trace], layout);
+    }
+
+    function checkCoefficients(input_k, input_b) {
+        return Number(k) === Number(input_k) && Number(b) === Number(input_b);
+    }
+
+    function updatePlot() {
+        var input_k = document.getElementById('input_k');
+        var input_b = document.getElementById('input_b');
+
+        var entered_k = parseFloat(input_k.value);
+        var entered_b = parseFloat(input_b.value);
+
+        var resultText = checkCoefficients(entered_k, entered_b) ? 'Верно' : 'Неверно';
+
+        document.getElementById('result').innerText = resultText;
+    }
+
+    function generateNewGraph() {
+        k = Math.floor(Math.random() * 21) - 10;
+        b = Math.floor(Math.random() * 21) - 10;
+        plotLine();
+        document.getElementById('result').innerText = '';
+        document.getElementById('input_k').value = '0';
+        document.getElementById('input_b').value = '0';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        k = Math.floor(Math.random() * 21) - 10;
+        b = Math.floor(Math.random() * 21) - 10;
+
+        var input_k = document.createElement('input');
+        input_k.type = 'number';
+        input_k.id = 'input_k';
+        input_k.min = '-10';
+        input_k.max = '10';
+        input_k.value = '0';
+
+        var input_b = document.createElement('input');
+        input_b.type = 'number';
+        input_b.id = 'input_b';
+        input_b.min = '-10';
+        input_b.max = '10';
+        input_b.value = '0';
+
+        var buttonCheck = document.createElement('button');
+        buttonCheck.textContent = 'Проверить';
+        buttonCheck.onclick = updatePlot;
+
+        var buttonNewGraph = document.createElement('button');
+        buttonNewGraph.textContent = 'Новый график';
+        buttonNewGraph.onclick = generateNewGraph;
+
+        var telegramBtn = document.createElement('a');
+        telegramBtn.href = 'https://t.me/tasmaths';  // Замените ссылку на ваш телеграм-канал
+        telegramBtn.id = 'telegram-btn';
+
+        var telegramIcon = document.createElement('img');
+        telegramIcon.src = 'statik/styles/images/free-icon-telegram-logo-87413.png';  // Путь к вашей иконке Телеграма
+        telegramIcon.alt = 'Telegram Icon';
+        telegramIcon.id = 'telegram-icon';
+
+        telegramBtn.appendChild(telegramIcon);
+        telegramBtn.appendChild(document.createTextNode('Больше интерактивных заданий'));
+
+        var inputsContainer = document.createElement('div');
+        inputsContainer.appendChild(document.createTextNode('Коэффициент k: '));
+        inputsContainer.appendChild(input_k);
+        inputsContainer.appendChild(document.createTextNode('Коэффициент b: '));
+        inputsContainer.appendChild(input_b);
+        inputsContainer.appendChild(buttonCheck);
+        inputsContainer.appendChild(buttonNewGraph);
+
+        document.body.appendChild(inputsContainer);
+        document.body.appendChild(document.createElement('hr'));
+        var plotContainer = document.createElement('div');
+        plotContainer.id = 'plot-container';
+        document.body.appendChild(plotContainer);
+        document.body.appendChild(document.createElement('div')).id = 'result';
+
+        plotLine();
+
+        document.body.appendChild(telegramBtn);
+    });
+</script>
+
+</body>
+</html>
